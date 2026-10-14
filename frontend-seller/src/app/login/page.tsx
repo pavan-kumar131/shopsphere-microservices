@@ -1,0 +1,9 @@
+"use client";
+import Link from "next/link";
+import { FormEvent, useState } from "react";
+import { login, saveSession } from "@/lib/api";
+export default function LoginPage() {
+ const [email,setEmail]=useState(""); const [password,setPassword]=useState(""); const [error,setError]=useState(""); const [busy,setBusy]=useState(false);
+ async function submit(e:FormEvent){e.preventDefault();setBusy(true);setError("");try{const s=await login(email,password);saveSession(s);window.location.href=s.role==="ADMIN"?"/admin":"/";}catch(err){setError(err instanceof Error?err.message:"Unable to sign in");}finally{setBusy(false);}}
+ return <main className="authPage"><section className="authIntro"><p className="eyebrow">YOUR SHOPSPHERE ACCOUNT</p><h1>Welcome<br/><em>back.</em></h1><p>Sign in to keep exploring the everyday edit.</p><div className="authDecoration">S.</div></section><section className="formCard"><p className="eyebrow">ACCOUNT ACCESS</p><h2>Sign in</h2><p className="muted">Enter the email and password associated with your account.</p><form onSubmit={submit} className="formStack"><label>Email address<input type="email" autoComplete="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com"/></label><label>Password<input type="password" autoComplete="current-password" required value={password} onChange={e=>setPassword(e.target.value)} placeholder="Your password"/></label>{error&&<p className="errorText" role="alert">{error}</p>}<button className="primaryButton full" disabled={busy}>{busy?"Signing in…":"Sign in"}<span>→</span></button></form><p className="formFoot">New to ShopSphere? <Link href="/register">Create an account</Link></p><p className="securityNote">Demo project: bearer tokens are stored in browser localStorage. Use a secure HttpOnly-cookie/BFF design before production.</p></section></main>;
+}

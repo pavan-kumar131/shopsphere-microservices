@@ -1,0 +1,79 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ShopSphere ECR repositories; deploy this stack before building images.
+Parameters:
+  ProjectName:
+    Type: String
+    Default: shopsphere
+    AllowedPattern: '^[a-z][a-z0-9-]{2,20}$'
+Resources:
+  FrontendRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub '${ProjectName}/frontend'
+      ImageScanningConfiguration: { ScanOnPush: true }
+      ImageTagMutability: IMMUTABLE
+      EncryptionConfiguration: { EncryptionType: AES256 }
+      LifecyclePolicy:
+        LifecyclePolicyText: '{"rules":[{"rulePriority":1,"description":"Keep last 20 tagged images","selection":{"tagStatus":"tagged","tagPrefixList":["git-"],"countType":"imageCountMoreThan","countNumber":20},"action":{"type":"expire"}}]}'
+  CustomerFrontendRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub '${ProjectName}/customer-frontend'
+      ImageScanningConfiguration: { ScanOnPush: true }
+      ImageTagMutability: IMMUTABLE
+  SellerFrontendRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub '${ProjectName}/seller-frontend'
+      ImageScanningConfiguration: { ScanOnPush: true }
+      ImageTagMutability: IMMUTABLE
+  AdminFrontendRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub '${ProjectName}/admin-frontend'
+      ImageScanningConfiguration: { ScanOnPush: true }
+      ImageTagMutability: IMMUTABLE
+  NginxRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub '${ProjectName}/nginx'
+      ImageScanningConfiguration: { ScanOnPush: true }
+      ImageTagMutability: IMMUTABLE
+  GatewayRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub '${ProjectName}/api-gateway'
+      ImageScanningConfiguration: { ScanOnPush: true }
+      ImageTagMutability: IMMUTABLE
+      EncryptionConfiguration: { EncryptionType: AES256 }
+  AuthRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub '${ProjectName}/auth-service'
+      ImageScanningConfiguration: { ScanOnPush: true }
+      ImageTagMutability: IMMUTABLE
+      EncryptionConfiguration: { EncryptionType: AES256 }
+  OrderRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub '${ProjectName}/order-service'
+      ImageScanningConfiguration: { ScanOnPush: true }
+      ImageTagMutability: IMMUTABLE
+      EncryptionConfiguration: { EncryptionType: AES256 }
+  ProductRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub '${ProjectName}/product-service'
+      ImageScanningConfiguration: { ScanOnPush: true }
+      ImageTagMutability: IMMUTABLE
+      EncryptionConfiguration: { EncryptionType: AES256 }
+Outputs:
+  FrontendRepositoryUri: { Value: !GetAtt FrontendRepository.RepositoryUri }
+  CustomerFrontendRepositoryUri: { Value: !GetAtt CustomerFrontendRepository.RepositoryUri }
+  SellerFrontendRepositoryUri: { Value: !GetAtt SellerFrontendRepository.RepositoryUri }
+  AdminFrontendRepositoryUri: { Value: !GetAtt AdminFrontendRepository.RepositoryUri }
+  NginxRepositoryUri: { Value: !GetAtt NginxRepository.RepositoryUri }
+  GatewayRepositoryUri: { Value: !GetAtt GatewayRepository.RepositoryUri }
+  AuthRepositoryUri: { Value: !GetAtt AuthRepository.RepositoryUri }
+  ProductRepositoryUri: { Value: !GetAtt ProductRepository.RepositoryUri }
+  OrderRepositoryUri: { Value: !GetAtt OrderRepository.RepositoryUri }

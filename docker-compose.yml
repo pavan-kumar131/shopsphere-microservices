@@ -1,0 +1,140 @@
+services:
+  customer-frontend:
+    build: ./frontend-customer
+    environment: { PORT: "3000", NODE_ENV: production, NEXT_PUBLIC_API_BASE_URL: "" }
+    expose: ["3000"]
+    restart: unless-stopped
+  seller-frontend:
+    build: ./frontend-seller
+    environment: { PORT: "3000", NODE_ENV: production, NEXT_PUBLIC_API_BASE_URL: "" }
+    expose: ["3001"]
+    restart: unless-stopped
+  admin-frontend:
+    build: ./frontend-admin
+    environment: { PORT: "3000", NODE_ENV: production, NEXT_PUBLIC_API_BASE_URL: "" }
+    expose: ["3002"]
+    restart: unless-stopped
+  nginx:
+    build: ./nginx
+    ports: ["3001:80"]
+    depends_on: [customer-frontend, seller-frontend, admin-frontend, api-gateway]
+    restart: unless-stopped
+  api-gateway:
+    build: ./api-gateway
+    ports: ["8080:8080"]
+    environment:
+      AUTH_SERVICE_URL: http://auth-service:8081
+      PRODUCT_SERVICE_URL: http://product-service:8082
+      ORDER_SERVICE_URL: http://order-service:8084
+      PAYMENT_SERVICE_URL: http://payment-service:8085
+      NOTIFICATION_SERVICE_URL: http://notification-service:8086
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+    depends_on:
+      auth-service: { condition: service_healthy }
+      product-service: { condition: service_healthy }
+      order-service: { condition: service_healthy }
+      payment-service: { condition: service_healthy }
+      notification-service: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/actuator/health | grep -q UP"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 90s
+    restart: unless-stopped
+  auth-service:
+    build: ./auth-service
+    environment:
+      SERVER_PORT: 8081
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-ecommerce}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-ecommerce_app}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@shopsphere.local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env}
+    depends_on: { postgres: { condition: service_healthy } }
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8081/actuator/health | grep -q UP"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 90s
+    restart: unless-stopped
+  product-service:
+    build: ./product-service
+    environment:
+      SERVER_PORT: 8082
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-ecommerce}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-ecommerce_app}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:?Set INTERNAL_SERVICE_TOKEN in .env}
+    depends_on: { postgres: { condition: service_healthy } }
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8082/actuator/health | grep -q UP"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 90s
+    restart: unless-stopped
+  order-service:
+    build: ./order-service
+    environment:
+      SERVER_PORT: 8084
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-ecommerce}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-ecommerce_app}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:?Set INTERNAL_SERVICE_TOKEN in .env}
+      PRODUCT_SERVICE_URL: http://product-service:8082
+    depends_on:
+      postgres: { condition: service_healthy }
+      product-service: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8084/actuator/health | grep -q UP"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 90s
+    restart: unless-stopped
+  payment-service:
+    build: ./payment-service
+    environment:
+      SERVER_PORT: 8085
+      PAYMENT_SANDBOX_ONLY: "true"
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8085/actuator/health | grep -q UP"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    restart: unless-stopped
+  notification-service:
+    build: ./notification-service
+    environment:
+      SERVER_PORT: 8086
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8086/actuator/health | grep -q UP"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    restart: unless-stopped
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ecommerce}
+      POSTGRES_USER: ${POSTGRES_USER:-ecommerce_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    ports: ["5432:5432"]
+    volumes: ["postgres_data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ecommerce_app} -d ${POSTGRES_DB:-ecommerce}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+volumes:
+  postgres_data:
