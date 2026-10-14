@@ -1,6 +1,10 @@
 # ShopSphere — e-commerce microservices project
 
+<<<<<<< HEAD
 A Docker Compose development project based on the existing ShopSphere repository. It includes three separately running Next.js frontends (customer, seller, admin), Nginx reverse proxy, Spring Cloud Gateway, Auth and separate IAM services, Google Identity Services sign-in, Product/Order services, typed Spring Cloud OpenFeign clients, sandbox Payment Service, Notification API, and PostgreSQL persistence.
+=======
+A Docker Compose development project based on the existing ShopSphere repository. It includes three separately running Next.js frontends (customer, seller, admin), Nginx reverse proxy, Spring Cloud Gateway, Auth/Product/Order services, a typed Spring Cloud OpenFeign client from Order Service to Product Service, sandbox Payment Service, Notification API, and PostgreSQL persistence for the existing account/catalog/order paths.
+>>>>>>> origin/main
 
 ## Start locally
 
@@ -8,9 +12,14 @@ Requirements: Docker Engine and the Docker Compose plugin.
 
 ```bash
 cp .env.example .env
+<<<<<<< HEAD
 # Set strong local values for POSTGRES_PASSWORD, JWT_SECRET, ADMIN_PASSWORD and INTERNAL_SERVICE_TOKEN.
 # JWT_SECRET should be base64 for at least 32 random bytes, e.g. openssl rand -base64 48
 # Configure GOOGLE_CLIENT_ID using docs/GOOGLE-AUTH-IAM-TESTING.md; leave it blank to disable Google sign-in.
+=======
+# Edit .env and replace every REPLACE_* value with strong local values.
+# JWT_SECRET should be base64 for at least 32 random bytes, e.g. openssl rand -base64 48
+>>>>>>> origin/main
 docker compose config
 docker compose up --build -d
 docker compose ps
@@ -20,9 +29,13 @@ Open `http://localhost:3001` for the customer storefront. Nginx routes `/seller/
 
 ## Main API routes
 
+<<<<<<< HEAD
 - `POST /api/auth/register`, `POST /api/auth/login` — local password authentication.
 - `POST /api/auth/google` — Google ID-token verification, IAM lookup/first-customer creation, and ShopSphere JWT issuance.
 - `iam-service` — private identity/role service with Flyway schema and admin allow-list; it is not exposed as a public host port.
+=======
+- `POST /api/auth/register`, `POST /api/auth/login` — authentication.
+>>>>>>> origin/main
 - `/api/products/**` — product catalog.
 - `POST /api/orders` and `/api/orders/**` — customer-owned order workflow. Checkout requires a bearer token and `Idempotency-Key`.
 - `POST /api/payments` — creates a **sandbox-only** payment record; requires `Idempotency-Key`.
@@ -44,7 +57,11 @@ Review `docs/DEPLOYMENT.md`, `docs/IAM-POLICY.md`, and `infrastructure/` before 
 
 ## Verification
 
+<<<<<<< HEAD
 See `docs/GOOGLE-AUTH-IAM-TESTING.md`, `docs/VERIFICATION-REPORT.md` and `docs/REQUIREMENTS-CROSSCHECK.md` for setup, tests and remaining gaps. Run `make validate` for offline structural checks, `make test` for Java unit tests, and `make integration-test` for Compose health/routing checks. This environment has no Docker or Maven executable, so container builds and Java compilation/tests could not be run here. Static project/configuration checks are not a substitute for running the full stack on your machine.
+=======
+See `docs/VERIFICATION-REPORT.md` and `docs/REQUIREMENTS-CROSSCHECK.md` for checks and unverified areas. Run `make validate` for offline structural checks. This environment has no Docker or Maven executable, so container builds and Java compilation/tests could not be run here. Static project/configuration checks are not a substitute for running the full stack on your machine.
+>>>>>>> origin/main
 
 
 ## JWT and backend authorization update

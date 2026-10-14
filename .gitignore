@@ -7,6 +7,13 @@
 **/target/
 **/build/
 **/dist/
+<<<<<<< HEAD
 *.pem
 *.key
 *.log
+=======
+.idea/
+.vscode/
+*.log
+.DS_Store
+>>>>>>> origin/main

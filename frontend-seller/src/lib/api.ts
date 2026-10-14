@@ -54,12 +54,15 @@ export async function login(email: string, password: string): Promise<Session> {
   }));
 }
 
+<<<<<<< HEAD
 export async function googleLogin(idToken: string, site: "customer" | "seller" | "admin"): Promise<Session> {
   return parseResponse<Session>(await fetch(`${API_BASE}/api/auth/google`, {
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ idToken, site })
   }));
 }
 
+=======
+>>>>>>> origin/main
 export async function createProduct(input: Omit<Product, "id">, token: string) {
   return parseResponse<Product>(await fetch(`${API_BASE}/api/products`, {
     method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(input)

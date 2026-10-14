@@ -1,5 +1,6 @@
 services:
   customer-frontend:
+<<<<<<< HEAD
     build:
       context: ./frontend-customer
       args:
@@ -43,15 +44,34 @@ services:
       timeout: 5s
       retries: 10
       start_period: 60s
+=======
+    build: ./frontend-customer
+    environment: { PORT: "3000", NODE_ENV: production, NEXT_PUBLIC_API_BASE_URL: "" }
+    expose: ["3000"]
+    restart: unless-stopped
+  seller-frontend:
+    build: ./frontend-seller
+    environment: { PORT: "3000", NODE_ENV: production, NEXT_PUBLIC_API_BASE_URL: "" }
+    expose: ["3001"]
+    restart: unless-stopped
+  admin-frontend:
+    build: ./frontend-admin
+    environment: { PORT: "3000", NODE_ENV: production, NEXT_PUBLIC_API_BASE_URL: "" }
+    expose: ["3002"]
+>>>>>>> origin/main
     restart: unless-stopped
   nginx:
     build: ./nginx
     ports: ["3001:80"]
+<<<<<<< HEAD
     depends_on:
       customer-frontend: { condition: service_healthy }
       seller-frontend: { condition: service_healthy }
       admin-frontend: { condition: service_healthy }
       api-gateway: { condition: service_healthy }
+=======
+    depends_on: [customer-frontend, seller-frontend, admin-frontend, api-gateway]
+>>>>>>> origin/main
     restart: unless-stopped
   api-gateway:
     build: ./api-gateway
@@ -86,6 +106,7 @@ services:
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@shopsphere.local}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env}
+<<<<<<< HEAD
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       IAM_SERVICE_URL: http://iam-service:8087
     depends_on:
@@ -109,6 +130,11 @@ services:
     depends_on: { postgres: { condition: service_healthy } }
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8087/actuator/health | grep -q UP"]
+=======
+    depends_on: { postgres: { condition: service_healthy } }
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8081/actuator/health | grep -q UP"]
+>>>>>>> origin/main
       interval: 20s
       timeout: 5s
       retries: 10

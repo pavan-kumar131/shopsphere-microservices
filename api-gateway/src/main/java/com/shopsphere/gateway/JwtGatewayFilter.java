@@ -6,7 +6,11 @@ import org.springframework.beans.factory.annotation.Value; import org.springfram
  public JwtGatewayFilter(@Value("${security.jwt.secret}") String secret){byte[] b=Base64.getDecoder().decode(secret);if(b.length<32)throw new IllegalArgumentException("JWT_SECRET must decode to at least 32 bytes");key=Keys.hmacShaKeyFor(b);}
  @Override public int getOrder(){return -100;}
  @Override public Mono<Void> filter(ServerWebExchange exchange,GatewayFilterChain chain){ServerHttpRequest req=exchange.getRequest();String path=req.getURI().getPath();HttpMethod method=req.getMethod();
+<<<<<<< HEAD
   boolean publicAuth=path.equals("/api/auth/register")||path.equals("/api/auth/login")||path.equals("/api/auth/google"); boolean publicProduct=path.startsWith("/api/products")&&HttpMethod.GET.equals(method); boolean health=path.equals("/actuator/health");
+=======
+  boolean publicAuth=path.equals("/api/auth/register")||path.equals("/api/auth/login"); boolean publicProduct=path.startsWith("/api/products")&&HttpMethod.GET.equals(method); boolean health=path.equals("/actuator/health");
+>>>>>>> origin/main
   if(publicAuth||publicProduct||health||HttpMethod.OPTIONS.equals(method))return chain.filter(exchange);
   try {String h=req.getHeaders().getFirst("Authorization");if(h==null||!h.startsWith("Bearer "))throw new IllegalArgumentException();Claims c=Jwts.parser().verifyWith(key).build().parseSignedClaims(h.substring(7)).getPayload();String role=c.get("role",String.class);if(c.getSubject()==null||c.getExpiration()==null||c.getExpiration().getTime()<=System.currentTimeMillis())throw new IllegalArgumentException();
    if(path.startsWith("/api/products")&&(HttpMethod.POST.equals(method)||HttpMethod.PUT.equals(method)||HttpMethod.PATCH.equals(method)||HttpMethod.DELETE.equals(method))){boolean ok="ADMIN".equals(role)||(HttpMethod.POST.equals(method)&&"SELLER".equals(role));if(!ok)return reject(exchange,HttpStatus.FORBIDDEN);}

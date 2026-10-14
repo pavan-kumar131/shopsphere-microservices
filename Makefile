@@ -7,13 +7,21 @@ build:
 	docker compose build
 
 test:
+<<<<<<< HEAD
 	@for service in auth-service iam-service product-service api-gateway order-service payment-service notification-service; do \
+=======
+	@for service in auth-service product-service api-gateway order-service payment-service notification-service; do \
+>>>>>>> origin/main
 	  echo "== $$service tests =="; docker run --rm -v "$$PWD/$$service:/workspace" -w /workspace maven:3.9-eclipse-temurin-21 mvn -B test || exit $$?; \
 	done
 
 integration-test:
+<<<<<<< HEAD
 	docker compose up --build -d
 	bash scripts/smoke-test.sh
+=======
+	@echo 'Run Docker Compose, then follow docs/LOCAL-VERIFICATION-CHECKLIST.md for checkout, RBAC, and ownership tests.'
+>>>>>>> origin/main
 
 up:
 	cp -n .env.example .env || true
