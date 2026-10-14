@@ -1,0 +1,34 @@
+server:
+  port: ${SERVER_PORT:8087}
+  shutdown: graceful
+spring:
+  application:
+    name: iam-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/ecommerce}
+    username: ${SPRING_DATASOURCE_USERNAME:ecommerce_app}
+    password: ${SPRING_DATASOURCE_PASSWORD:change_me}
+    hikari:
+      maximum-pool-size: 5
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: iam
+  flyway:
+    schemas: iam
+    default-schema: iam
+    create-schemas: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+app:
+  admin-emails: ${ADMIN_EMAILS:${ADMIN_EMAIL:admin@shopsphere.local}}
