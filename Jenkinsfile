@@ -22,18 +22,13 @@ pipeline {
       steps {
         sh '''
           set -eu
-<<<<<<< HEAD
           for service in auth-service iam-service product-service api-gateway order-service payment-service notification-service; do
-=======
-          for service in auth-service product-service api-gateway order-service payment-service notification-service; do
->>>>>>> origin/main
             docker run --rm -v "$WORKSPACE/$service:/workspace" -w /workspace \\
               maven:3.9-eclipse-temurin-21 mvn -B test
           done
         '''
       }
     }
-<<<<<<< HEAD
     stage('Frontend typecheck and production builds') {
       steps {
         sh '''
@@ -60,8 +55,6 @@ pipeline {
         '''
       }
     }
-=======
->>>>>>> origin/main
     stage('CloudFormation validation') {
       steps {
         sh '''

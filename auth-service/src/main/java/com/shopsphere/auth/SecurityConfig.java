@@ -36,11 +36,7 @@ public class SecurityConfig {
             .cors(Customizer.withDefaults())
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(a -> a
-<<<<<<< HEAD
                 .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/google", "/actuator/health", "/actuator/health/**").permitAll()
-=======
-                .requestMatchers("/api/auth/register", "/api/auth/login", "/actuator/health").permitAll()
->>>>>>> origin/main
                 .anyRequest().denyAll())
             .httpBasic(b -> b.disable())
             .formLogin(f -> f.disable())

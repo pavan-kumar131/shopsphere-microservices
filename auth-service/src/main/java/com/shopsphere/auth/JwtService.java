@@ -23,7 +23,6 @@ public class JwtService {
     }
 
     public String issue(UserAccount user) {
-<<<<<<< HEAD
         return issue(user.getId().toString(), user.getEmail(), user.getRole());
     }
 
@@ -33,13 +32,6 @@ public class JwtService {
             .subject(userId)
             .claim("email", email)
             .claim("role", role)
-=======
-        Instant now = Instant.now();
-        return Jwts.builder()
-            .subject(user.getId().toString())
-            .claim("email", user.getEmail())
-            .claim("role", user.getRole())
->>>>>>> origin/main
             .issuedAt(Date.from(now))
             .expiration(Date.from(now.plusSeconds(expirationMinutes * 60)))
             .signWith(key)

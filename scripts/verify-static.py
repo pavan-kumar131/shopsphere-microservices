@@ -32,11 +32,7 @@ if yaml:
             build=service.get('build') if isinstance(service,dict) else None
             if isinstance(build,str) and not (ROOT/build).is_dir(): fail(f'{name} build context missing: {build}')
             if isinstance(build,dict) and build.get('context') and not (ROOT/build['context']).is_dir(): fail(f'{name} build context missing: {build["context"]}')
-<<<<<<< HEAD
         for name in ['customer-frontend','seller-frontend','admin-frontend','nginx','api-gateway','auth-service','product-service','order-service','payment-service','notification-service','iam-service','postgres']:
-=======
-        for name in ['customer-frontend','seller-frontend','admin-frontend','nginx','api-gateway','auth-service','product-service','order-service','payment-service','notification-service','postgres']:
->>>>>>> origin/main
             if name not in services: fail(f'Required Compose service missing: {name}')
             else: ok(f'Compose service exists: {name}')
     except Exception as e: fail(f'Invalid Compose YAML: {e}')
@@ -51,7 +47,6 @@ checks_text={
  'Seller ownership enforced':'You can only manage products you own' in (ROOT/'product-service/src/main/java/com/shopsphere/product/ProductController.java').read_text(),
  'Payment owner check':'Payment belongs to another customer' in (ROOT/'payment-service/src/main/java/com/shopsphere/payment/PaymentController.java').read_text(),
  'JWT expiration checked':'getExpiration()' in (ROOT/'api-gateway/src/main/java/com/shopsphere/gateway/JwtGatewayFilter.java').read_text(),
-<<<<<<< HEAD
  'Google ID token verifier present':'class GoogleVerifier' in (ROOT/'auth-service/src/main/java/com/shopsphere/auth/GoogleVerifier.java').read_text(),
  'Google login endpoint present':'@PostMapping("/google")' in (ROOT/'auth-service/src/main/java/com/shopsphere/auth/GoogleAuthController.java').read_text(),
  'Google login allowed through gateway':'/api/auth/google' in (ROOT/'api-gateway/src/main/java/com/shopsphere/gateway/JwtGatewayFilter.java').read_text(),
@@ -61,8 +56,6 @@ checks_text={
  'IAM health check configured':'iam-service' in (ROOT/'docker-compose.yml').read_text() and '127.0.0.1:8087/actuator/health' in (ROOT/'docker-compose.yml').read_text(),
  'Auth controller unit tests present':(ROOT/'auth-service/src/test/java/com/shopsphere/auth/GoogleAuthControllerTest.java').exists(),
  'IAM tests present':any((ROOT/'iam-service/src/test').rglob('*Test.java')),
-=======
->>>>>>> origin/main
  'Feign client present':'@FeignClient' in (ROOT/'order-service/src/main/java/com/shopsphere/orders/ProductClient.java').read_text(),
  'Atomic stock reservation query':'reserveStock' in (ROOT/'product-service/src/main/java/com/shopsphere/product/ProductRepository.java').read_text() and 'p.stock >= :quantity' in (ROOT/'product-service/src/main/java/com/shopsphere/product/ProductRepository.java').read_text(),
  'Internal service token is configured':'INTERNAL_SERVICE_TOKEN' in (ROOT/'docker-compose.yml').read_text() and 'security:\n  jwt:' in (ROOT/'product-service/src/main/resources/application.yml').read_text(),

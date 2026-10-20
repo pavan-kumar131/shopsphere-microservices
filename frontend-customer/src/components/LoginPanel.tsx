@@ -1,6 +1,5 @@
 "use client";
 
-<<<<<<< HEAD
 import { FormEvent, useRef, useState } from "react";
 import Script from "next/script";
 import { googleLogin, login, saveSession } from "@/lib/api";
@@ -16,17 +15,12 @@ declare global {
 
 const SITE = "customer" as const;
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
-=======
-import { FormEvent, useState } from "react";
-import { login } from "@/lib/api";
->>>>>>> origin/main
 
 export default function LoginPanel() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
-<<<<<<< HEAD
   const googleButton = useRef<HTMLDivElement>(null);
 
   function initializeGoogle() {
@@ -55,37 +49,15 @@ export default function LoginPanel() {
       setMessage(`Signed in as ${result.email}. Role: ${result.role}.`);
     } catch (error) { setMessage(error instanceof Error ? error.message : "Unable to sign in."); }
     finally { setBusy(false); }
-=======
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setMessage("");
-    setBusy(true);
-    try {
-      const result = await login(email, password);
-      // Demo only: do not persist bearer tokens in localStorage for production.
-      setMessage(`Signed in as ${result.email}. Role: ${result.role}.`);
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Unable to sign in.");
-    } finally {
-      setBusy(false);
-    }
->>>>>>> origin/main
   }
 
   return (
     <div className="loginCard">
-<<<<<<< HEAD
       {GOOGLE_CLIENT_ID && <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" onLoad={initializeGoogle} />}
       <p className="eyebrow">ACCOUNT ACCESS</p>
       <h3>Welcome back.</h3>
       <p className="loginHint">Sign in to ShopSphere customer.</p>
       {GOOGLE_CLIENT_ID ? <div ref={googleButton} aria-label="Continue with Google" /> : <p className="finePrint">Google sign-in is disabled until NEXT_PUBLIC_GOOGLE_CLIENT_ID is configured.</p>}
-=======
-      <p className="eyebrow">ACCOUNT ACCESS</p>
-      <h3>Welcome back.</h3>
-      <p className="loginHint">Sign in to test the Auth Service API.</p>
->>>>>>> origin/main
       <form onSubmit={handleSubmit}>
         <label htmlFor="email">Email address</label>
         <input id="email" type="email" autoComplete="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com"/>
@@ -94,11 +66,7 @@ export default function LoginPanel() {
         <button className="primaryButton full" disabled={busy}>{busy ? "Signing in…" : "Sign in"} <span>→</span></button>
       </form>
       {message && <p className="formMessage" role="status">{message}</p>}
-<<<<<<< HEAD
       <p className="finePrint">Use Google Identity Services with a configured OAuth Web client ID. Admin access is allow-listed by IAM.</p>
-=======
-      <p className="finePrint">Demo login only. Production session and token storage must be hardened.</p>
->>>>>>> origin/main
     </div>
   );
 }
