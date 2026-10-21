@@ -1,9 +1,36 @@
 package com.shopsphere.orders;
-import com.fasterxml.jackson.databind.ObjectMapper;import javax.crypto.Mac;import javax.crypto.spec.SecretKeySpec;import java.nio.charset.StandardCharsets;import java.util.Base64;import java.util.Map;import org.springframework.beans.factory.annotation.Value;import org.springframework.stereotype.Component;import org.springframework.web.server.ResponseStatusException;import org.springframework.http.HttpStatus;
-@Component public class TokenClaims {
- private final byte[] secret; private final ObjectMapper mapper=new ObjectMapper(); public TokenClaims(@Value("${shopsphere.jwt-secret}") String secret){this.secret=Base64.getDecoder().decode(secret);if(this.secret.length<32)throw new IllegalArgumentException("JWT_SECRET must be base64 for at least 32 random bytes");}
- public Claims require(String auth){try{if(auth==null||!auth.startsWith("Bearer "))throw new Exception();String[] p=auth.substring(7).split("\\.");if(p.length!=3||!constantTime(sign(p[0]+"."+p[1]),p[2]))throw new Exception();Map<?,?> m=mapper.readValue(Base64.getUrlDecoder().decode(p[1]),Map.class);long exp=((Number)m.get("exp")).longValue();if(exp<System.currentTimeMillis()/1000)throw new Exception();return new Claims(Long.parseLong(m.get("sub").toString()),String.valueOf(m.get("role")));}catch(Exception e){throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Valid bearer token required");}}
- private boolean constantTime(String a,String b){return java.security.MessageDigest.isEqual(a.getBytes(StandardCharsets.UTF_8),b.getBytes(StandardCharsets.UTF_8));}
- private String sign(String value)throws Exception{Mac mac=Mac.getInstance("HmacSHA256");mac.init(new SecretKeySpec(secret,"HmacSHA256"));return Base64.getUrlEncoder().withoutPadding().encodeToString(mac.doFinal(value.getBytes(StandardCharsets.UTF_8)));}
- public record Claims(Long userId,String role){}
+
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import java.util.Base64;
+import javax.crypto.SecretKey;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
+
+@Component
+public class TokenClaims {
+    private final SecretKey key;
+
+    public TokenClaims(@Value("${shopsphere.jwt-secret}") String secret) {
+        byte[] decoded = Base64.getDecoder().decode(secret);
+        if (decoded.length < 32) throw new IllegalArgumentException("JWT_SECRET must be base64 for at least 32 random bytes");
+        this.key = Keys.hmacShaKeyFor(decoded);
+    }
+
+    public Claims require(String auth) {
+        try {
+            if (auth == null || !auth.startsWith("Bearer ")) throw new IllegalArgumentException("Missing bearer token");
+            io.jsonwebtoken.Claims c = Jwts.parser().verifyWith(key).build()
+                    .parseSignedClaims(auth.substring(7)).getPayload();
+            String role = c.get("role", String.class);
+            if (c.getSubject() == null || role == null) throw new IllegalArgumentException("Required claims missing");
+            return new Claims(Long.valueOf(c.getSubject()), role);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Valid bearer token required");
+        }
+    }
+
+    public record Claims(Long userId, String role) {}
 }

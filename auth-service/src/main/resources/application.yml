@@ -36,9 +36,7 @@ security:
 app:
   admin:
     email: ${ADMIN_EMAIL:admin@shopsphere.local}
-    password: ${ADMIN_PASSWORD:AdminDemo123!}
-
-app:
+    password: ${ADMIN_PASSWORD}
   google-client-id: ${GOOGLE_CLIENT_ID:}
   google-jwks-uri: https://www.googleapis.com/oauth2/v3/certs
   iam-url: ${IAM_SERVICE_URL:http://iam-service:8087}
